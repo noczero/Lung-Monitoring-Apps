@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "179997314036",
+    "firebase_url": "https://lung-apps-default-rtdb.firebaseio.com",
+    "project_id": "lung-apps",
+    "storage_bucket": "lung-apps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179997314036:android:af21c691a81542fddfc7a1",
+        "android_client_info": {
+          "package_name": "com.example.healthmonitoring"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179997314036-kv8vpafgk6sn81atidrup9a72lk3oa0n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOlgfh7yJcNFbSJgbIvI1pRGvXztsk7pU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179997314036-kv8vpafgk6sn81atidrup9a72lk3oa0n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
