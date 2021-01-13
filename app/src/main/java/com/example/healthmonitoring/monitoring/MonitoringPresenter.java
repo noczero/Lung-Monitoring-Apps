@@ -10,8 +10,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
+
 public class MonitoringPresenter {
     private MonitoringView view;
+
+    // format
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
 
     //
     String good_result = "Paru-paru anda sehat!";
@@ -22,10 +27,16 @@ public class MonitoringPresenter {
     private ValueEventListener mDBListener;
     private String node = "device1"; // node name in firebase
     private String childColor = "color"; // child name
+    private String childSpiro = "spirometer";
     private String temperature;
     private String colorR, colorG, colorB;
+    private String analogSpiro, voltageSpiro;
     private double currentTemperature = 0;
     private double prevTemperature = 0;
+    private double vital_capacity = 0;
+    private double minVoltage = 999;
+    private double maxVoltage = -999;
+
 
     // constructor
     public MonitoringPresenter(MonitoringView view){
@@ -52,16 +63,6 @@ public class MonitoringPresenter {
                     // set status temperature
                     view.setTemperatureStatus(discreteTemperature(Double.parseDouble(temperature)));
 
-                    // make final decision
-                    if(colorR != null && colorR != null && colorG != null){
-                        String result = makeDecision(
-                                Double.parseDouble(temperature),
-                                Double.parseDouble(colorR),
-                                Double.parseDouble(colorG),
-                                Double.parseDouble(colorB)
-                        );
-                        view.setDecisionResult(result);
-                    }
                 }
             }
 
@@ -72,7 +73,7 @@ public class MonitoringPresenter {
         });
     }
 
-    // get temperature from firebase
+    // get color from firebase
     void getColor(){
 
         //get firebase reference based on node
@@ -91,19 +92,13 @@ public class MonitoringPresenter {
                     // set okisgen color to view
                     view.setColor(colorR, colorG, colorB);
 
-                    // set oksigen s
-                    view.setOksigenStatus(discreteOksigen(Double.parseDouble(colorR)));
+                    view.setBValue("B : " + colorB);
+                    view.setGValue("G : " + colorG);
+                    view.setRValue("R : " + colorR);
 
-                    // make final decision
-                    if(temperature != null){
-                        String result = makeDecision(
-                                Double.parseDouble(temperature),
-                                Double.parseDouble(colorR),
-                                Double.parseDouble(colorG),
-                                Double.parseDouble(colorB)
-                        );
-                        view.setDecisionResult(result);
-                    }
+                    // set oksigen s
+                    view.setNailColor(colorR, colorG, colorB);
+
                 }
             }
 
@@ -112,6 +107,65 @@ public class MonitoringPresenter {
                 Log.d("firebase-error", "onCancelled: " + databaseError);
             }
         });
+    }
+
+    // get spirometer from firebase
+    void getSpiroMeter(){
+
+        //get firebase reference based on node
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference(node);
+
+        // listener
+        mDBListener = mDatabaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    // get value of temperature
+                    analogSpiro = String.valueOf(dataSnapshot.child(childSpiro).child("analog").getValue());
+                    voltageSpiro = String.valueOf(dataSnapshot.child(childSpiro).child("voltage").getValue());
+
+                    view.setAnalogSpiro(analogSpiro);
+                    view.setVoltageSpiro(voltageSpiro);
+
+                    // track max, min value
+                    Double maxVoltage = getMaximumVoltage(Double.parseDouble(voltageSpiro));
+                    Double minVoltage = getMinimumVoltage(Double.parseDouble(voltageSpiro));
+                    view.setVMax(maxVoltage.toString());
+                    view.setVMin(minVoltage.toString());
+
+                    // calculate pengukuran
+                    Double vcUkur =  maxVoltage - minVoltage;
+                    view.setVolumeUkur(vcUkur.toString());
+
+                    // decision
+                    if (checkVitalCapacity(vcUkur,vital_capacity))
+                        view.setDecisionSpiro(good_result);
+                    else
+                        view.setDecisionSpiro(bad_result);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("firebase-error", "onCancelled: " + databaseError);
+            }
+        });
+    }
+
+
+    // calculate volume estimasion based on physical parameter
+    void calculate_estimated_vital_capacity(int age, int height, String gender){
+
+        if(gender.toLowerCase().equals("pria")){
+            //vital_capacity = (0.051 - 0.112 * age) * height;
+            vital_capacity = (0.052 * height) - (0.022*age) - 3.00;
+        } else if (gender.toLowerCase().equals("wanita")){
+            //vital_capacity = (21.78 -0.101 * age) * height;
+            vital_capacity = (0.041 * height) - (0.018*age) - 2.69;
+        }
+
+        view.setStandartVolume(df2.format(vital_capacity));
     }
 
     // get result decision
@@ -129,9 +183,9 @@ public class MonitoringPresenter {
     private String discreteTemperature(double temperature){
         String status = null;
 
-        if ((temperature >= 20) && (temperature <= 35.4)) {
+        if ((temperature >= 20) && (temperature <= 36.5)) {
             status = "Low";
-        } else if ((temperature >= 35.4) && (temperature <= 37.4)) {
+        } else if ((temperature >= 36.5) && (temperature <= 37.2)) {
             status = "Normal";
         } else if  (temperature > 37.4) {
             status = "High";
@@ -153,4 +207,27 @@ public class MonitoringPresenter {
         return status;
     }
 
+
+    private double getMinimumVoltage(double voltage){
+        if (voltage < minVoltage){
+            minVoltage = voltage;
+            return voltage;
+        } else
+            return minVoltage;
+    }
+
+    private double getMaximumVoltage(double voltage){
+        if(voltage > maxVoltage){
+            maxVoltage = voltage;
+            return voltage;
+        } else
+            return maxVoltage;
+    }
+
+    private boolean checkVitalCapacity(double VCUkur , double estimasiVC){
+        if (VCUkur > (estimasiVC * 0.8))
+            return true;
+        else
+            return false;
+    }
 }

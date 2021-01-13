@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">YourLung.id - Lung Monitoring</string>
+    <string name="welcome_msg">
+        Selamat Datang di Aplikasi Lung Monitoring,
+        Kamu bisa cek kesehatan dini paru-paru menggunakan aplikasi ini.
+        Silahkan masukan umur, tinggi badan, dan jenis-kelamin. Kemudian klik mulai! </string>
+
+    <string name="temperature_ideal">
+        Temperature Normal diambang batas 36.5 - 37.2 C.
+    </string>
+
+    <string-array name="gender">
+        <item>Pria</item>
+        <item>Wanita</item>
+    </string-array>
+
+    <string name="spirometer_ideal">
+        Paru-paru sehat jika nilai Ukur > (Estimasi * 0.8).
+    </string>
+
+    <string name="title_activity_fuzzy_logic">FuzzyLogic</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 </resources>
