@@ -36,6 +36,7 @@ public class MonitoringPresenter {
     private double vital_capacity = 0;
     private double minVoltage = 999;
     private double maxVoltage = -999;
+    private double vcUkur = 0;
 
 
     // constructor
@@ -124,18 +125,19 @@ public class MonitoringPresenter {
                     analogSpiro = String.valueOf(dataSnapshot.child(childSpiro).child("analog").getValue());
                     voltageSpiro = String.valueOf(dataSnapshot.child(childSpiro).child("voltage").getValue());
 
-                    view.setAnalogSpiro(analogSpiro);
-                    view.setVoltageSpiro(voltageSpiro);
+                    view.setAnalogSpiro(df2.format(Double.parseDouble(analogSpiro)));
+                    view.setVoltageSpiro(df2.format(Double.parseDouble(voltageSpiro)));
 
                     // track max, min value
                     Double maxVoltage = getMaximumVoltage(Double.parseDouble(voltageSpiro));
                     Double minVoltage = getMinimumVoltage(Double.parseDouble(voltageSpiro));
-                    view.setVMax(maxVoltage.toString());
-                    view.setVMin(minVoltage.toString());
+                    view.setVMax(df2.format(maxVoltage));
+                    view.setVMin(df2.format(minVoltage));
 
-                    // calculate pengukuran
-                    Double vcUkur =  maxVoltage - minVoltage;
-                    view.setVolumeUkur(vcUkur.toString());
+                    // calculate vital capacity
+                    vcUkur=  maxVoltage - minVoltage ;
+
+                    view.setVolumeUkur(df2.format(vcUkur));
 
                     // decision
                     if (checkVitalCapacity(vcUkur,vital_capacity))
@@ -152,6 +154,7 @@ public class MonitoringPresenter {
             }
         });
     }
+
 
 
     // calculate volume estimasion based on physical parameter

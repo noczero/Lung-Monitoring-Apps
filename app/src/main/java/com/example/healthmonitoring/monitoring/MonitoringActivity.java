@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ekn.gruzer.gaugelibrary.ArcGauge;
 import com.ekn.gruzer.gaugelibrary.MultiGauge;
 import com.ekn.gruzer.gaugelibrary.Range;
+import com.example.healthmonitoring.AHP.AHPActivity;
 import com.example.healthmonitoring.fuzzy.FuzzyActivity;
 import com.example.healthmonitoring.R;
 
@@ -36,7 +37,6 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
 
     @BindView(R.id.nail_color)
     ImageView nailColor;
-
 
     @BindView(R.id.red_value)
     TextView redValue;
@@ -68,6 +68,7 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
     @BindView(R.id.spiro_decision)
     TextView spiroDecision;
 
+    String ageStr, vitalCapacityStr;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,12 +90,12 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
 
         // get intent
         Intent intent = getIntent();
-        String age = intent.getStringExtra("AGE");
+        ageStr = intent.getStringExtra("AGE");
         String height = intent.getStringExtra("HEIGHT");
         String gender = intent.getStringExtra("GENDER");
 
         // set standart estimated VC
-        presenter.calculate_estimated_vital_capacity(Integer.parseInt(age),Integer.parseInt(height), gender);
+        presenter.calculate_estimated_vital_capacity(Integer.parseInt(ageStr),Integer.parseInt(height), gender);
 
         // invoke the methods
         presenter.getTemperature();
@@ -153,6 +154,7 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
 
     @Override
     public void setVolumeUkur(String value) {
+        vitalCapacityStr = value;
         volumeUkur.setText("Pengukuran : " + value + " L");
     }
 
@@ -240,10 +242,10 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
 
     // run fuzzy activity
     public void startFuzzyActivity(View view){
-        Double temperature = tempGauge.getValue();
-        Double red_color = spiroMeter.getValue();
-        Double green_color = spiroMeter.getSecondValue();
-        Double blue_color = spiroMeter.getThirdValue();
+        double temperature = tempGauge.getValue();
+        double red_color = spiroMeter.getValue();
+        double green_color = spiroMeter.getSecondValue();
+        double blue_color = spiroMeter.getThirdValue();
 
         //call fuzzy activity intent
         Intent intent = new Intent(this, FuzzyActivity.class);
@@ -261,6 +263,27 @@ public class MonitoringActivity extends AppCompatActivity implements MonitoringV
         Log.d("FUZZY-VARIABLE", "G : " + green_color);
 
         // invoke
+        startActivity(intent);
+    }
+
+    // run ahp activity
+    public void startAHPActivity(View view){
+        double temperature = tempGauge.getValue();
+        double red_color = spiroMeter.getValue();
+        double green_color = spiroMeter.getSecondValue();
+        double blue_color = spiroMeter.getThirdValue();
+        double vitalCapacity = Double.parseDouble(vitalCapacityStr);
+        double age = Double.parseDouble(ageStr);
+
+        Intent intent = new Intent(this, AHPActivity.class);
+
+        intent.putExtra("TEMPERATURE", temperature);
+        intent.putExtra("R", red_color);
+        intent.putExtra("G", green_color);
+        intent.putExtra("B", blue_color);
+        intent.putExtra("VC", vitalCapacity);
+        intent.putExtra("AGE", age);
+
         startActivity(intent);
     }
 

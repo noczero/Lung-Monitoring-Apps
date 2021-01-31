@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".monitoring.MonitoringActivity" />
         <activity android:name=".fuzzy.FuzzyActivity"></activity>
+        <activity android:name=".AHP.AHPActivity"/>
     </application>
 
 

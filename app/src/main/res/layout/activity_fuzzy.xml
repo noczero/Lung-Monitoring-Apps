@@ -28,7 +28,7 @@ android:fitsSystemWindows="true">
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Hasil"
+                    android:text="Hasil Fuzzy"
                     android:textSize="18dp"
                     android:textStyle="bold" />
 
@@ -38,7 +38,9 @@ android:fitsSystemWindows="true">
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="0"
-                    android:textSize="12dp"
+                    android:textSize="24dp"
+                    android:textStyle="bold"
+                    android:layout_margin="5dp"
                     />
 
                 <TextView
@@ -58,7 +60,8 @@ android:fitsSystemWindows="true">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
